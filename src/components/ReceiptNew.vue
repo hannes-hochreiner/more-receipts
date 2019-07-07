@@ -51,7 +51,7 @@ export default {
     uuid: Function
   },
   data: () => ({
-    date: new Date().toISOString().substr(0, 10),
+    date: (new Date()).toISOString().substr(0, 10),
     menu: false,
     amount: null,
     dateRules: [
@@ -84,8 +84,14 @@ export default {
         });
 
         this.$emit('update-objects', objs);
-        this.$refs.form.reset();
-        this.date = new Date().toISOString().substr(0, 10);
+
+        // resetting the form did not work well with setting the date again
+        // hence, I am resetting the form manually
+        // afterwards, the validation needs to be reset
+        this.category = null;
+        this.amount = null;
+        this.date = (new Date()).toISOString().substr(0, 10);
+        this.$refs.form.resetValidation();
       }
     },
     combochange(e) {
