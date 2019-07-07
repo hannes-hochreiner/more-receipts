@@ -1,6 +1,6 @@
 <template>
   <v-layout row wrap>
-    <v-flex xs12 sm6 md4>
+    <v-flex xs12 sm6 md4 offset-xs0 offset-sm3 offset-md4>
       <v-form ref="form" lazy-validation>
         <v-menu
           v-model="menu"
