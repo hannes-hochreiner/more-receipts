@@ -13,6 +13,15 @@
              </v-list-tile-content>
           </v-list-tile>
         </template>
+        <v-list-tile key="total">
+           <v-list-tile-content>
+              <v-list-tile-title>
+                <v-layout>
+                  total<v-spacer></v-spacer>{{formatAmount(total)}}
+                </v-layout>
+              </v-list-tile-title>
+           </v-list-tile-content>
+        </v-list-tile>
       </v-list>
     </v-flex>
   </v-layout>
@@ -27,6 +36,21 @@ export default {
   data: () => ({
   }),
   computed: {
+    total: function() {
+      if (typeof this.categories === 'undefined' || this.categories === null) {
+        return {};
+      }
+
+      if (typeof this.receipts === 'undefined' || this.receipts === null) {
+        return {};
+      }
+
+      return this.receipts.reduce((acc, elem) => {
+        acc += elem.amount;
+
+        return acc;
+      }, 0);
+    },
     sums: function() {
       if (typeof this.categories === 'undefined' || this.categories === null) {
         return {};
