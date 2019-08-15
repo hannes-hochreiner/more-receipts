@@ -1,7 +1,6 @@
 export default class Repository {
-  constructor(uuid, PouchDb) {
+  constructor(uuid) {
     this._uuid = uuid;
-    this._db = new PouchDb('https://receipt.hochreiner.net/api');
     console.log(this._db);
     this.createCategories();
     this._receipts = [];
