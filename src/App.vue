@@ -17,6 +17,7 @@
 <script>
 import Repository from './Repository.mock'
 import {default as uuid} from 'uuid/v4'
+import {default as PouchDb} from 'pouchdb'
 import ReceiptNew from './components/ReceiptNew'
 import ReceiptRecent from './components/ReceiptRecent'
 
@@ -27,7 +28,7 @@ export default {
     ReceiptRecent
   },
   data () {
-    let repo = new Repository(uuid);
+    let repo = new Repository(uuid, PouchDb);
 
     return {
       categories: null,
