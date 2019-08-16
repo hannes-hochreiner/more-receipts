@@ -1,9 +1,13 @@
 export default class Repository {
-  constructor(uuid) {
+  constructor(ps, uuid) {
+    this._ps = ps;
     this._uuid = uuid;
-    console.log(this._db);
     this.createCategories();
     this._receipts = [];
+
+    this._ps.subscribe('sys.getCategories.request', this._getCategories.bind(this));
+    this._ps.subscribe('sys.updateObjects.request', this._updateObjects.bind(this));
+    this._ps.subscribe('sys.getReceiptsInInterval.request', this._getReceiptsInInterval.bind(this));
   }
 
   createCategories() {
@@ -19,19 +23,39 @@ export default class Repository {
     });
   }
 
-  getCategories() {
-    return new Promise((res) => {
-      res(this._categories);
+  _getCategories(topic) {
+    this._ps.publish(`sys.getCategories.response.${topic.split('.')[3]}`, {
+      ok: true,
+      categories: this._categories
     });
   }
 
-  getReceipts(start, end) {
-    return new Promise((res) => {
-      res(this._receipts.filter(elem => elem.date.localeCompare(start) > -1 && elem.date.localeCompare(end) < 1));
+  _getReceiptsInInterval(topic, data) {
+    if (!data.start || !data.end) {
+      this._ps.publish(`sys.getReceiptsInInterval.response.${topic.split('.')[3]}`, {
+        error: 'interval not defined'
+      });
+
+      return;
+    }
+
+    this._ps.publish(`sys.getReceiptsInInterval.response.${topic.split('.')[3]}`, {
+      ok: true,
+      receipts: this._receipts.filter(elem => elem.date.localeCompare(data.start) > -1 && elem.date.localeCompare(data.end) < 1)
     });
   }
 
-  updateObject(obj) {
+  async _updateObjects(topic, data) {
+    for (let idx in data.objects) {
+      await this._updateObject(data.objects[idx]);
+    }
+
+    this._ps.publish(`sys.updateObjects.response.${topic.split('.')[3]}`, {
+      ok: true
+    });
+  }
+
+  _updateObject(obj) {
     return new Promise((res, rej) => {
       if (typeof obj._id !== 'undefined') {
         let key;

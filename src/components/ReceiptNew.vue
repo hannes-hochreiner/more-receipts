@@ -6,7 +6,6 @@
           v-model="menu"
           :close-on-content-click="false"
           :nudge-right="40"
-          lazy
           transition="scale-transition"
           offset-y
           full-width
@@ -16,7 +15,7 @@
             <v-text-field
               v-model="date"
               label="date"
-              prepend-icon="event"
+              prepend-icon="mdi-calendar"
               readonly
               v-on="on"
               :rules="dateRules"
@@ -27,6 +26,7 @@
         <v-text-field
           v-model="amount"
           :rules="amountRules"
+          prepend-icon="mdi-cash-100"
           label="amount"
         ></v-text-field>
         <v-combobox
@@ -46,8 +46,7 @@
 <script>
 export default {
   props: {
-    categories: Array,
-    init: Boolean,
+    ps: Object,
     uuid: Function
   },
   data: () => ({
@@ -63,9 +62,21 @@ export default {
     categoryRules: [
       v => ((v !== null) && (typeof v === 'object')) || 'please select a category'
     ],
-    category: null
+    category: null,
+    categories: []
   }),
+  beforeMount: function() {
+    this.ps.subscribe('sys.getCategories.response', this.updateCategories.bind(this));
+    this.ps.publish(`sys.getCategories.request.${this.uuid()}`);
+  },
   methods: {
+    updateCategories(topic, data) {
+      if (!data.ok && typeof data.categories !== 'undefined') {
+        return
+      }
+
+      this.categories = data.categories;
+    },
     submit () {
       if (this.$refs.form.validate()) {
         this.menu = false;
@@ -83,7 +94,9 @@ export default {
           category_id: this.category.id
         });
 
-        this.$emit('update-objects', objs);
+        this.ps.publish(`sys.updateObjects.request.${this.uuid()}`, {
+          objects: objs
+        });
 
         // resetting the form did not work well with setting the date again
         // hence, I am resetting the form manually

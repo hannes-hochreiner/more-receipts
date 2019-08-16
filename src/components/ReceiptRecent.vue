@@ -3,25 +3,25 @@
     <v-flex xs12 sm6 md4 offset-xs0 offset-sm3 offset-md4>
       <v-list>
         <template v-for="(amount, category) in sums">
-          <v-list-tile :key="category">
-             <v-list-tile-content>
-                <v-list-tile-title>
+          <v-list-item :key="category">
+             <v-list-item-content>
+                <v-list-item-title>
                   <v-layout>
                     {{category}}<v-spacer></v-spacer>{{formatAmount(amount)}}
                   </v-layout>
-                </v-list-tile-title>
-             </v-list-tile-content>
-          </v-list-tile>
+                </v-list-item-title>
+             </v-list-item-content>
+          </v-list-item>
         </template>
-        <v-list-tile key="total">
-           <v-list-tile-content>
-              <v-list-tile-title>
+        <v-list-item key="total">
+           <v-list-item-content>
+              <v-list-item-title>
                 <v-layout>
                   total<v-spacer></v-spacer>{{formatAmount(total)}}
                 </v-layout>
-              </v-list-tile-title>
-           </v-list-tile-content>
-        </v-list-tile>
+              </v-list-item-title>
+           </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-flex>
   </v-layout>
@@ -29,12 +29,26 @@
 <script>
 export default {
   props: {
-    categories: Array,
-    receipts: Array,
-    init: Boolean
+    ps: Object,
+    uuid: Function
   },
-  data: () => ({
-  }),
+  data: function() {
+    return {
+      categories: [],
+      receipts: []
+    };
+  },
+  beforeMount: function() {
+    this.ps.subscribe('sys.updateObjects.response', function(topic, data) {
+      if (!data || !data.ok) {
+        return;
+      }
+
+      this.requestUpdates();
+    }.bind(this));
+
+    this.requestUpdates();
+  },
   computed: {
     total: function() {
       if (typeof this.categories === 'undefined' || this.categories === null) {
@@ -80,6 +94,43 @@ export default {
     }
   },
   methods: {
+    requestReceiptUpdate() {
+      let id = this.uuid();
+      let token = this.ps.subscribe(`sys.getReceiptsInInterval.response.${id}`, function(topic, data) {
+        this.ps.unsubscribe(token);
+
+        if (!data.ok || !data.receipts) {
+          return;
+        }
+
+        this.receipts = data.receipts;
+      }.bind(this));
+
+      let dateStart = new Date();
+      dateStart.setDate(dateStart.getDate() - 30);
+
+      this.ps.publish(`sys.getReceiptsInInterval.request.${id}`, {
+        start: dateStart.toISOString().substr(0, 10),
+        end: (new Date()).toISOString().substr(0, 10)
+      });
+    },
+    requestCategoryUpdate() {
+      let id = this.uuid();
+      let token = this.ps.subscribe(`sys.getCategories.response.${id}`, function(topic, data) {
+        this.ps.unsubscribe(token);
+
+        if (!data.ok || !data.categories) {
+          return;
+        }
+
+        this.categories = data.categories;
+      }.bind(this));
+      this.ps.publish(`sys.getCategories.request.${id}`);
+    },
+    requestUpdates() {
+      this.requestCategoryUpdate();
+      this.requestReceiptUpdate();
+    },
     formatAmount: function(amt) {
       let tok = (Math.round(amt * 100) / 100).toString().split('.');
 
