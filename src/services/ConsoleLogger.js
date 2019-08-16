@@ -7,6 +7,11 @@ export default class ConsoleLogger {
 
   _log(topic, data) {
     // eslint-disable-next-line
-    console.log(`${(new Date).toISOString()}: ${topic} ${JSON.stringify(data)}`);
+    console.log({
+      timestamp: new Date(),
+      topic: topic,
+      data: data
+    });
+    // console.log(`${(new Date()).toISOString()}: ${topic} ${JSON.stringify(data)}`);
   }
 }
