@@ -10,10 +10,10 @@ export default {
   },
   methods: {
     sync: function() {
-      let pst = this.ps.subscribe(`sys.synchronizeDatabase.request`, function(topic, data) {
+      let pst = this.ps.subscribe(`sys.synchronizeDatabase.response`, function(topic, data) {
         this.ps.unsubscribe(pst);
 
-        if (data.ok) {
+        if (data && data.ok) {
           this.ps.publish('log.success', {title: 'synchronization succeeded'});
         } else {
           this.ps.publish('log.error', {title: 'synchronization failed'});
