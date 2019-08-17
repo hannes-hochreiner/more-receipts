@@ -18,7 +18,7 @@ export default {
         } else {
           this.ps.publish('log.error', {title: 'synchronization failed'});
         }
-      });
+      }.bind(this));
       this.ps.publish(`sys.synchronizeDatabase.request`);
     }
   }
