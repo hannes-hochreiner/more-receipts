@@ -63,13 +63,38 @@ export default {
       v => ((v !== null) && (typeof v === 'object')) || 'please select a category'
     ],
     category: null,
-    categories: []
+    categories: [],
+    subs: []
   }),
   beforeMount: function() {
-    this.ps.subscribe('sys.getCategories.response', this.updateCategories.bind(this));
+    this.subs.push(this.ps.subscribe('sys.getCategories.response', this.updateCategories.bind(this)));
+    this.subs.push(this.ps.subscribe('sys.updateCategory.response', this.responseNotification.bind(this)));
+    this.subs.push(this.ps.subscribe('sys.updateReceipt.response', this.responseNotification.bind(this)));
     this.ps.publish(`sys.getCategories.request.${this.uuid()}`);
   },
   methods: {
+    responseNotification(topic, data) {
+      let tt = topic.split('.');
+      let msgType = '<unknown>';
+
+      if (tt[1] == 'updateCategory') {
+        msgType = 'category';
+      } else if (tt[1] == 'updateReceipt') {
+        msgType = 'receipt';
+      }
+
+      let logType = 'error';
+      let logVerb = 'failed';
+
+      if (data && data.ok) {
+        logType = 'success';
+        logVerb = 'succeeded';
+      }
+
+      this.ps.publish(`log.${logType}`, {
+        title: `creation of ${msgType} ${logVerb}`
+      });
+    },
     updateCategories(topic, data) {
       if (!data.ok && typeof data.categories !== 'undefined') {
         return
