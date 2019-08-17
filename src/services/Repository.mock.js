@@ -5,9 +5,10 @@ export default class Repository {
     this.createCategories();
     this._receipts = [];
 
-    this._ps.subscribe('sys.getCategories.request', this._getCategories.bind(this));
-    this._ps.subscribe('sys.updateObjects.request', this._updateObjects.bind(this));
-    this._ps.subscribe('sys.getReceiptsInInterval.request', this._getReceiptsInInterval.bind(this));
+    this._ps.subscribe('sys.getCategories.request', this.getCategories.bind(this));
+    this._ps.subscribe('sys.updateCategory.request', this.updateCategory.bind(this));
+    this._ps.subscribe('sys.getReceiptsInInterval.request', this.getReceiptsInInterval.bind(this));
+    this._ps.subscribe('sys.updateReceipt.request', this.updateReceipt.bind(this));
   }
 
   createCategories() {
@@ -23,14 +24,21 @@ export default class Repository {
     });
   }
 
-  _getCategories(topic) {
+  getCategories(topic) {
     this._ps.publish(`sys.getCategories.response.${topic.split('.')[3]}`, {
       ok: true,
       categories: this._categories
     });
   }
 
-  _getReceiptsInInterval(topic, data) {
+  async updateCategory(topic, data) {
+    let tt = topic.split('.');
+    tt[2] = 'response';
+
+    this._ps.publish(tt.join('.'), await this._updateObject(data));
+  }
+
+  getReceiptsInInterval(topic, data) {
     if (!data.start || !data.end) {
       this._ps.publish(`sys.getReceiptsInInterval.response.${topic.split('.')[3]}`, {
         error: 'interval not defined'
@@ -45,14 +53,11 @@ export default class Repository {
     });
   }
 
-  async _updateObjects(topic, data) {
-    for (let idx in data.objects) {
-      await this._updateObject(data.objects[idx]);
-    }
+  async updateReceipt(topic, data) {
+    let tt = topic.split('.');
+    tt[2] = 'response';
 
-    this._ps.publish(`sys.updateObjects.response.${topic.split('.')[3]}`, {
-      ok: true
-    });
+    this._ps.publish(tt.join('.'), await this._updateObject(data));
   }
 
   _updateObject(obj) {
@@ -88,7 +93,11 @@ export default class Repository {
         }
       }
 
-      res();
+      res({
+        ok: true,
+        id: obj._id,
+        rev: obj._rev
+      });
     });
   }
 }

@@ -10,6 +10,7 @@
   "dependencies": {
     "amazon-cognito-identity-js": "^3.0.15",
     "core-js": "^2.6.5",
+    "pouchdb": "^7.1.1",
     "pubsub-js": "^1.7.0",
     "uuid": "^3.3.2",
     "vue": "^2.6.10",

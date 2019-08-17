@@ -39,12 +39,20 @@ export default {
     };
   },
   beforeMount: function() {
-    this.ps.subscribe('sys.updateObjects.response', function(topic, data) {
+    this.ps.subscribe('sys.updateReceipt.response', function(topic, data) {
       if (!data || !data.ok) {
         return;
       }
 
-      this.requestUpdates();
+      this.requestReceiptUpdate();
+    }.bind(this));
+
+    this.ps.subscribe('sys.updateCategory.response', function(topic, data) {
+      if (!data || !data.ok) {
+        return;
+      }
+
+      this.requestCategoryUpdate();
     }.bind(this));
 
     this.requestUpdates();

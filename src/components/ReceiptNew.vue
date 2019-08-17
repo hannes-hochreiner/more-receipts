@@ -80,22 +80,17 @@ export default {
     submit () {
       if (this.$refs.form.validate()) {
         this.menu = false;
-        let objs = [];
 
         if (typeof this.categories.find(elem => elem.id === this.category.id) === 'undefined') {
-          objs.push(this.category);
+          this.ps.publish(`sys.updateCategory.request.${this.uuid()}`, this.category);
         }
 
-        objs.push({
+        this.ps.publish(`sys.updateReceipt.request.${this.uuid()}`, {
           type: 'receipt',
           id: this.uuid(),
           date: this.date,
           amount: Number.parseFloat(this.amount),
           category_id: this.category.id
-        });
-
-        this.ps.publish(`sys.updateObjects.request.${this.uuid()}`, {
-          objects: objs
         });
 
         // resetting the form did not work well with setting the date again
