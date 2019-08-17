@@ -19,7 +19,8 @@
 
 <script>
 import ConsoleLogger from './services/ConsoleLogger';
-import Repository from './services/Repository.mock';
+import Repository from './services/Repository';
+// import Repository from './services/Repository.mock';
 import Authentication from './services/Authentication';
 import ReceiptNew from './components/ReceiptNew';
 import ReceiptRecent from './components/ReceiptRecent';
@@ -27,9 +28,11 @@ import Auth from './components/Auth';
 import InfoBar from './components/InfoBar';
 import { default as uuid } from 'uuid/v4';
 import { default as ps } from 'pubsub-js';
+import { default as PouchDb } from 'pouchdb';
 
 new ConsoleLogger(ps);
-new Repository(ps, uuid);
+// new Repository(ps, uuid);
+new Repository(ps, new PouchDb('receipt', {auto_compaction: true}));
 new Authentication(ps);
 
 export default {

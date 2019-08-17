@@ -10,19 +10,19 @@ export default class Repository {
   }
 
   async getCategories(topic) {
+    let tt = topic.split('.');
+    tt[2] = 'response';
+
     try {
-      let tt = topic.split('.');
-      tt[2] = 'response';
-  
       let res = await this._pouchdb.allDocs({
         include_docs: true,
-        startKey: 'category',
-        endKey: 'category\ufff0'
+        startkey: 'category',
+        endkey: 'category\ufff0'
       });
 
       this._ps.publish(tt.join('.'), {
         ok: true,
-        categories: res.rows
+        categories: res.rows.map(function(elem) { return elem.doc; })
       });
     } catch (err) {
       this._ps.publish(tt.join('.'), {
@@ -32,10 +32,10 @@ export default class Repository {
   }
 
   async updateCategory(topic, data) {
-    try {
-      let tt = topic.split('.');
-      tt[2] = 'response';
+    let tt = topic.split('.');
+    tt[2] = 'response';
 
+    try {
       if (!data || data.type != 'category') {
         this._ps.publish(tt.join('.'), {
           error: new Error('no object to update or wrong object type')
@@ -54,10 +54,10 @@ export default class Repository {
   }
 
   async getReceiptsInInterval(topic, data) {
-    try {
-      let tt = topic.split('.');
-      tt[2] = 'response';
+    let tt = topic.split('.');
+    tt[2] = 'response';
 
+    try {
       if (!data || !data.start || !data.end) {
         this._ps.publish(tt.join('.'), {
           error: new Error('no interval provided')
@@ -67,13 +67,13 @@ export default class Repository {
 
       let res = await this._pouchdb.allDocs({
         include_docs: true,
-        startKey: `receipt/${data.start}_`,
-        endKey: `receipt/${data.end}_\ufff0`
+        startkey: `receipt/${data.start}_`,
+        endkey: `receipt/${data.end}_\ufff0`
       });
 
       this._ps.publish(tt.join('.'), {
         ok: true,
-        receipts: res.rows
+        receipts: res.rows.map(function(elem) { return elem.doc; })
       });
     } catch (err) {
       this._ps.publish(tt.join('.'), { error: err });
@@ -81,10 +81,10 @@ export default class Repository {
   }
 
   async updateReceipt(topic, data) {
-    try {
-      let tt = topic.split('.');
-      tt[2] = 'response';
+    let tt = topic.split('.');
+    tt[2] = 'response';
 
+    try {
       if (!data || data.type != 'receipt') {
         this._ps.publish(tt.join('.'), {
           error: new Error('no object to update or wrong object type')
