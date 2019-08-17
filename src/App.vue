@@ -6,6 +6,7 @@
         <span class="font-weight-light">RECEIPTS</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
+      <Sync :ps="ps"/>
       <Auth :uuid="uuid" :ps="ps"/>
     </v-app-bar>
 
@@ -26,13 +27,14 @@ import ReceiptNew from './components/ReceiptNew';
 import ReceiptRecent from './components/ReceiptRecent';
 import Auth from './components/Auth';
 import InfoBar from './components/InfoBar';
+import Sync from './components/Sync';
 import { default as uuid } from 'uuid/v4';
 import { default as ps } from 'pubsub-js';
 import { default as PouchDb } from 'pouchdb';
 
 new ConsoleLogger(ps);
 // new Repository(ps, uuid);
-new Repository(ps, new PouchDb('receipt', {auto_compaction: true}));
+new Repository(ps, PouchDb);
 new Authentication(ps);
 
 export default {
@@ -41,7 +43,8 @@ export default {
     ReceiptNew,
     ReceiptRecent,
     Auth,
-    InfoBar
+    InfoBar,
+    Sync
   },
   data: () => ({
     uuid: uuid,

@@ -29,7 +29,13 @@ export default class Authentication {
         ClientId : this._clientId
       });
 
-      userPool.getCurrentUser().getSession((error, session) => {
+      let currentUser = userPool.getCurrentUser();
+
+      if (!currentUser) {
+        reject();
+      }
+
+      currentUser.getSession((error, session) => {
         if (error) {
           reject(error);
           return;
@@ -62,9 +68,9 @@ export default class Authentication {
 
     try {
       try {
-        idToken = this._getCurrentIdToken();
+        idToken = await this._getCurrentIdToken();
       } catch (error) {
-        idToken = this._authenticate();
+        idToken = await this._authenticate();
       }
 
       this._ps.publish(`sys.getIdToken.response`, {
@@ -140,7 +146,7 @@ export default class Authentication {
           reject(new NewPasswordRequiredError(cognitoUser, userAttributes, requiredAttributes));
         }
       });
-    });
+    }.bind(this));
   }
 
   async _sendNewPassword(newPassword, cognitoUser, userAttributes) {
