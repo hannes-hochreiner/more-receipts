@@ -26,9 +26,13 @@ export default class Repository {
         }.bind(this),
         auto_compaction: true
       }));
-      console.log(res);
+      res.ok = true;
+      // res: {push: {ok: true}, pull: {ok: true}}
+      this._ps.publish(tt.join('.'), res);
     } catch (err) {
-      console.log(err);
+      this._ps.publish(tt.join('.'), {
+        error: err
+      });
       // result: {ok: false, errors: [], status: ''}
     }
   }
