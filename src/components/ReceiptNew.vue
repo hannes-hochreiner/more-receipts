@@ -72,6 +72,11 @@ export default {
     this.subs.push(this.ps.subscribe('sys.updateReceipt.response', this.responseNotification.bind(this)));
     this.ps.publish(`sys.getCategories.request.${this.uuid()}`);
   },
+  beforeDestroy: function() {
+    this.subs.forEach(function(sub) {
+      this.ps.unsubscribe(sub);
+    });
+  },
   methods: {
     responseNotification(topic, data) {
       let tt = topic.split('.');
