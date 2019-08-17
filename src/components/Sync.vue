@@ -13,7 +13,7 @@ export default {
       let pst = this.ps.subscribe(`sys.synchronizeDatabase.request`, function(topic, data) {
         this.ps.unsubscribe(pst);
 
-        if (data && data.ok) {
+        if (data.ok) {
           this.ps.publish('log.success', {title: 'synchronization succeeded'});
         } else {
           this.ps.publish('log.error', {title: 'synchronization failed'});
