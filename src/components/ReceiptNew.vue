@@ -75,7 +75,7 @@ export default {
   beforeDestroy: function() {
     this.subs.forEach(function(sub) {
       this.ps.unsubscribe(sub);
-    });
+    }.bind(this));
   },
   methods: {
     responseNotification(topic, data) {
