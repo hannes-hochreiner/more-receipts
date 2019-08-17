@@ -3,6 +3,7 @@ export default class Repository {
     this._ps = ps;
     this._dbName = 'receipt';
     this._dbSyncTarget = 'https://receipt.hochreiner.net/api';
+    this._PouchDbObject = PouchDb;
     this._pouchdb = new PouchDb(this._dbName, {auto_compaction: true});
 
     this._ps.subscribe('sys.getCategories.request', this.getCategories.bind(this));
@@ -18,11 +19,18 @@ export default class Repository {
     tt[2] = 'response';
 
     try {
-      await this._getIdToken();
-      let res = await this._pouchdb.sync(this._dbSyncTarget);
+      let idToken = await this._getIdToken();
+      let res = await this._pouchdb.sync(this._PouchDbObject(this._dbSyncTarget, {
+        fetch: function(url, opts) {
+          opts.headers.set('Authorization', `Bearer ${idToken}`);
+          return this._PouchDbObject.fetch(url, opts);
+        }.bind(this),
+        auto_compaction: true
+      }));
       console.log(res);
     } catch (err) {
       console.log(err);
+      // result: {ok: false, errors: [], status: ''}
     }
   }
 
