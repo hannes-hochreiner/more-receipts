@@ -2,7 +2,7 @@
   <div>
     <v-menu bottom left>
       <template v-slot:activator="{ on }">
-        <v-btn dark icon v-on="on" color="grey">
+        <v-btn icon v-on="on" color="secondary">
           <v-icon>mdi-account</v-icon>
         </v-btn>
       </template>

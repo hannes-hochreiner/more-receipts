@@ -38,7 +38,7 @@
           label="category"
           @change="combochange"
         ></v-combobox>
-        <v-btn @click="submit">create</v-btn>
+        <v-btn color="secondary" @click="submit">create</v-btn>
       </v-form>
     </v-flex>
   </v-layout>

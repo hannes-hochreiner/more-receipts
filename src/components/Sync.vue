@@ -1,5 +1,5 @@
 <template>
-  <v-btn dark icon @click="sync" color="grey">
+  <v-btn icon @click="sync" color="secondary">
     <v-icon>mdi-sync</v-icon>
   </v-btn>
 </template>

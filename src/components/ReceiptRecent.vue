@@ -1,6 +1,6 @@
 <template>
   <v-layout row wrap>
-    <v-flex xs12 sm6 md4 offset-xs0 offset-sm3 offset-md4>
+    <v-flex xs10 sm8 md6 offset-xs1 offset-sm2 offset-md3>
       <v-list>
         <template v-for="(amount, category) in sums">
           <v-list-item :key="category">
