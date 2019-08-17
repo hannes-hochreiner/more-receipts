@@ -14,7 +14,6 @@ export default class Repository {
   }
 
   async sync(topic) {
-    console.log('starting sync');
     let tt = topic.split('.');
     tt[2] = 'response';
 
@@ -49,7 +48,12 @@ export default class Repository {
           return;
         }
 
-        resolve(data);
+        if (!data.idToken) {
+          reject();
+          return;
+        }
+
+        resolve(data.idToken);
       }.bind(this));
 
       this._ps.publish('sys.getIdToken.request');
